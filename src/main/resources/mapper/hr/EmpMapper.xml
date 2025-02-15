@@ -1,0 +1,130 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "mybatis-3-mapper.dtd">
+<mapper namespace="com.example.myapp.hr.dao.IEmpRepository">
+
+	<select id="getEmpCount" resultType="int">
+		SELECT COUNT(*) FROM employees
+		<choose>
+			<when test="_parameter == null"></when>
+			<when test="_parameter.containsKey('departmentId')">
+				WHERE department_id=#{departmentId}
+			</when>
+			<when test="_parameter.containsKey('jobId')">
+				WHERE job_id=#{jobId}
+			</when>
+			<otherwise></otherwise>
+		</choose>		
+	</select>
+
+	<select id="getEmpListMap" resultType="hashmap">
+		SELECT 	employee_id 	AS "employeeId",
+				first_name 		AS "firstName",
+				last_name		AS "lastName",
+				email			AS "email",
+				phone_number	AS "phoneNumber",
+				to_char(hire_date, 'YYYY-MM-DD') AS	"hireDate",
+				job_id			AS "jobId",
+				salary			AS "salary",
+				commission_pct	AS "commissionPct",
+				manager_id		AS "managerId",
+				department_id	AS "departmentId"
+		FROM employees
+	</select>
+	
+	<select id="getEmpInfoMap" parameterType="int" resultType="hashmap">
+		SELECT 	employee_id 	AS "employeeId",
+				first_name 		AS "firstName",
+				last_name		AS "lastName",
+				email			AS "email",
+				phone_number	AS "phoneNumber",
+				to_char(hire_date, 'YYYY-MM-DD') AS	"hireDate",
+				job_id			AS "jobId",
+				salary			AS "salary",
+				commission_pct	AS "commissionPct",
+				manager_id		AS "managerId",
+				department_id	AS "departmentId"
+		FROM employees WHERE employee_id=#{empid}
+	</select>
+
+	<resultMap type="com.example.myapp.hr.model.Emp" id="empMap">
+		<result column="employee_id" 	property="employeeId" />
+		<result column="first_name" 	property="firstName" />
+		<result column="last_name" 	property="lastName" />
+		<result column="email" 	property="email" />
+		<result column="phone_number" 	property="phoneNumber" />
+		<result column="hire_date" 	property="hireDate" />
+		<result column="job_id" 	property="jobId" />
+		<result column="salary" 	property="salary" />
+		<result column="commission_pct" property="commissionPct" />
+		<result column="manager_id" 	property="managerId" />
+		<result column="department_id" 	property="departmentId" />
+	</resultMap>
+	
+	<select id="getEmpList" resultMap="empMap">
+		SELECT * FROM employees
+	</select>
+	
+	<select id="getEmpInfo" parameterType="int" resultType="com.example.myapp.hr.model.Emp">
+		SELECT 	employee_id 	AS employeeId,
+				first_name 		AS firstName,
+				last_name		AS lastName,
+				email			AS email,
+				phone_number	AS phoneNumber,
+				hire_date		AS hireDate,
+				job_id			AS jobId,
+				salary			AS salary,
+				commission_pct	AS commissionPct,
+				manager_id		AS managerId,
+				department_id	AS departmentId
+		FROM employees WHERE employee_id=#{empid}
+	</select>
+	
+	<insert id="insertEmp" parameterType="com.example.myapp.hr.model.Emp">
+		INSERT INTO employees 
+			(employee_id, first_name, last_name, email, phone_number, 
+			hire_date, job_id, salary, commission_pct, manager_id, 
+			department_id)
+		VALUES 
+			(#{employeeId}, #{firstName}, #{lastName}, #{email}, 
+			 #{phoneNumber}, #{hireDate}, #{jobId}, #{salary}, 
+			 #{commissionPct}, #{managerId}, #{departmentId})
+	</insert>
+
+	<update id="updateEmp" parameterType="com.example.myapp.hr.model.Emp">
+		UPDATE employees
+		SET	first_name=#{firstName}, last_name=#{lastName}, email=#{email}, 
+			phone_number=#{phoneNumber}, hire_date=#{hireDate}, 
+			job_id=#{jobId}, salary=#{salary}, commission_pct=#{commissionPct}, 
+			manager_id=#{managerId}, department_id=#{departmentId}
+		WHERE employee_id=#{employeeId}
+	</update>
+		
+	<delete id="deleteJobHistory" parameterType="int">
+		DELETE job_history WHERE employee_id=#{empid}
+	</delete>
+	
+	<delete id="deleteEmp">
+		DELETE employees WHERE employee_id=#{param1} AND email=#{param2}
+	</delete>
+	
+	<select id="getAllJobId" resultType="hashmap">
+		SELECT job_id AS "jobId", job_title AS "jobTitle" FROM jobs
+	</select>
+	
+	<select id="getAllManagerId" resultType="hashmap">
+		SELECT 
+			d.manager_id AS "managerId", 
+			e.first_name || ' ' || e.last_name AS "managerName" 
+		FROM departments d JOIN employees e 
+			ON d.manager_id = e.employee_id
+		ORDER BY d.manager_id
+	</select>
+	
+	<select id="getAllDeptId" resultType="hashmap">
+		SELECT 
+			department_id AS "departmentId", 
+			department_name AS "departmentName" 
+		FROM departments
+	</select>
+	
+</mapper>
