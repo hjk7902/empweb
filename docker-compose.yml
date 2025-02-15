@@ -1,0 +1,21 @@
+services:
+
+  db:
+    image: jinkyoungheo/oracle-xe  # Oracle 21c 이미지 사용
+    container_name: oracle-container
+    ports:
+      - 1521:1521
+    environment:
+      ORACLE_PASSWORD: oracle
+
+  app:
+    image: jinkyoungheo/emp-web # 스프링 부트 앱 이미지 사용
+    container_name: emp-web-container
+    ports:
+      - 8080:8080
+    environment:
+      DB_IP: 192.168.0.27
+      DB_USER: hr
+      DB_PASS: hr
+    depends_on:
+      - db
