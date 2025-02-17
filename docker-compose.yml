@@ -17,5 +17,6 @@ services:
       DB_IP: 192.168.0.27
       DB_USER: hr
       DB_PASS: hr
+      API_BASE_URL: "http://192.168.0.27:8080"
     depends_on:
       - db
